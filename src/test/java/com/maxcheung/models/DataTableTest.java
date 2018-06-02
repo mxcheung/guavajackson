@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,7 +30,7 @@ import com.maxcheung.service.DataTableServiceImpl;
 
 public class DataTableTest {
 
-	private final static String JSON_STRING = "{\"rowTotals\":{\"AANL\":{\"value\":\"10\"},\"AACB\":{\"value\":\"10\"},\"APAC\":{\"value\":\"10\"}},\"columnTotals\":{\"columnKey\":{\"value\":\"30\"}},\"grandTotal\":{\"value\":\"30\"},\"table\":{\"APAC\":{\"columnKey\":{\"value\":\"10\"}},\"AACB\":{\"columnKey\":{\"value\":\"10\"}},\"AANL\":{\"columnKey\":{\"value\":\"10\"}}}}";
+	private final static String JSON_STRING = "{\"rowTotals\":{\"AXEL\":{\"value\":\"10\"},\"ACME\":{\"value\":\"10\"},\"ALPHA\":{\"value\":\"10\"}},\"columnTotals\":{\"columnKey\":{\"value\":\"30\"}},\"grandTotal\":{\"value\":\"30\"},\"table\":{\"AXEL\":{\"columnKey\":{\"value\":\"10\"}},\"ALPHA\":{\"columnKey\":{\"value\":\"10\"}},\"ACME\":{\"columnKey\":{\"value\":\"10\"}}}}";
 
 	private ObjectMapper mapper;
 	private DataTableService dataTableService;
@@ -53,7 +52,7 @@ public class DataTableTest {
 	public void shouldDeserialize() throws JsonParseException, JsonMappingException, IOException {
 		DataTable dataTable = mapper.readValue(JSON_STRING, DataTable.class);
 		assertEquals("30", dataTable.getGrandTotal().getStringCellValue());
-		CellValue cellValue = dataTable.getTable().get("APAC", "columnKey");
+		CellValue cellValue = dataTable.getTable().get("AXEL", "columnKey");
 		assertEquals("10", cellValue.getStringCellValue());
 		assertEquals(CellType.CELLTYPE_STRING, cellValue.getCellType());
 	}
@@ -93,17 +92,10 @@ public class DataTableTest {
 		cellValue.setRowKey("rowKey");
 		cellValue.setColumnKey("columnKey");
 		cellValue.setCellValue(BigDecimal.TEN);
-
-		Collection<CellValue> values = table.values();
-		for (CellValue value : values) {
-
-		}
-		// HashBasedTable table = HashBasedTable.create();
-
 		List<String> rowIds = new ArrayList<String>();
-		rowIds.add("APAC");
-		rowIds.add("AACB");
-		rowIds.add("AANL");
+		rowIds.add("AXEL");
+		rowIds.add("ALPHA");
+		rowIds.add("ACME");
 		for (String rowId : rowIds) {
 			table.put(rowId, cellValue.getColumnKey(), cellValue);
 

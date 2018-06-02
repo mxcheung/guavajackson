@@ -29,7 +29,7 @@ import com.maxcheung.service.DataTableServiceImpl;
 
 public class GuavaDataTableTest {
 
-    private final static String JSON_STRING = "{\"guavaCustomTable\":{\"table\":{\"APAC\":{\"columnKey\":{\"value\":\"10\"}},\"ALPHA\":{\"columnKey\":{\"value\":\"10\"}},\"ACME\":{\"columnKey\":{\"value\":\"10\"}}}},\"rowTotals\":{\"ACME\":{\"value\":\"10\"},\"ALPHA\":{\"value\":\"10\"},\"APAC\":{\"value\":\"10\"}},\"columnTotals\":{\"columnKey\":{\"value\":\"30\"}},\"grandTotal\":{\"value\":\"30\"}}";
+    private final static String JSON_STRING = "{\"guavaCustomTable\":{\"table\":{\"AXEL\":{\"columnKey\":{\"value\":\"10\"}},\"ALPHA\":{\"columnKey\":{\"value\":\"10\"}},\"ACME\":{\"columnKey\":{\"value\":\"10\"}}}},\"rowTotals\":{\"AXEL\":{\"value\":\"10\"},\"ACME\":{\"value\":\"10\"},\"ALPHA\":{\"value\":\"10\"}},\"columnTotals\":{\"columnKey\":{\"value\":\"30\"}},\"grandTotal\":{\"value\":\"30\"}}";
 
     private ObjectMapper mapper;
 
@@ -81,7 +81,7 @@ public class GuavaDataTableTest {
 		cellValue.setColumnKey("columnKey");
 		cellValue.setCellValue(BigDecimal.TEN);
 		List<String> rowIds = new ArrayList<String>();
-		rowIds.add("APAC");
+		rowIds.add("AXEL");
 		rowIds.add("ALPHA");
 		rowIds.add("ACME");
 		for (String rowId : rowIds) {
