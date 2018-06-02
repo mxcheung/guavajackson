@@ -14,26 +14,66 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.maxcheung.models.CellValue;
 import com.maxcheung.models.CellValueDefault;
+import com.maxcheung.service.DataTableService;
 import com.maxcheung.service.DataTableServiceImpl;
 
 public class GuavaDataTableTest {
 
-	private DataTableServiceImpl dataTableService;
+    private final static String JSON_STRING = "{\"guavaCustomTable\":{\"table\":{\"APAC\":{\"columnKey\":{\"value\":\"10\"}},\"ALPHA\":{\"columnKey\":{\"value\":\"10\"}},\"ACME\":{\"columnKey\":{\"value\":\"10\"}}}},\"rowTotals\":{\"ACME\":{\"value\":\"10\"},\"ALPHA\":{\"value\":\"10\"},\"APAC\":{\"value\":\"10\"}},\"columnTotals\":{\"columnKey\":{\"value\":\"30\"}},\"grandTotal\":{\"value\":\"30\"}}";
+
+    private ObjectMapper mapper;
+
+	private DataTableService dataTableService;
 
 	@Before
 	public void setUp() {
+		mapper = new ObjectMapper();
+		mapper.registerModule(new GuavaModule());
 		dataTableService = new DataTableServiceImpl();
 	}
 
+	
+    @Test
+    public void shouldSerialize() throws JsonProcessingException {
+    	GuavaDataTable guavaDataTable = getGuavaDataTable();
+        String json = this.mapper.writeValueAsString(guavaDataTable);
+        assertEquals(JSON_STRING, json);
+    }
+
+    @Test
+    public void shouldDeserialize() throws JsonParseException, JsonMappingException, IOException  {
+    	GuavaDataTable guavaDataTable = mapper.readValue(JSON_STRING, GuavaDataTable.class);
+        assertEquals("30", guavaDataTable.getGrandTotal().getStringCellValue());
+    }
+
+	
 	@Test
-	public void shouldSerialise() throws Exception {
+	public void shouldSerialiseWitCustomDeserialiser() throws Exception {
+		GuavaDataTable dataTable = getGuavaDataTable();
+		String json = mapper.writeValueAsString(dataTable);
+		json = mapper.writeValueAsString(dataTable);
+		GuavaDataTable dataTable2 = mapper.readValue(json, GuavaDataTable.class);
+		Table<String, String, CellValue> before = dataTable.getGuavaCustomTable().getTable();
+		Set<String> beforeKey = before.rowKeySet();
+		Table<String, String, CellValue> after = dataTable2.getGuavaCustomTable().getTable();
+		after = dataTable2.getGuavaCustomTable().getTable();
+		Set<String> afterKey = after.rowKeySet();
+		assertEquals(afterKey, beforeKey);
+		assertEquals(mapper.writeValueAsString(dataTable2), mapper.writeValueAsString(dataTable));
+	}
+
+
+	private GuavaDataTable getGuavaDataTable() {
 		GuavaDataTable dataTable = new GuavaDataTable();
 		Table<String, String, CellValue> table = Tables.newCustomTable(new LinkedHashMap<>(), LinkedHashMap::new);
 		CellValue cellValue = new CellValueDefault();
@@ -53,18 +93,7 @@ public class GuavaDataTableTest {
 		dataTable.setColumnTotals(dataTableService.getColumnTotal(table));
 		dataTable.setRowTotals(dataTableService.getRowTotal(table));
 		dataTable.setGrandTotal(dataTableService.calcTotal(dataTable.getRowTotals()));
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new GuavaModule());
-		String json = mapper.writeValueAsString(dataTable);
-		json = mapper.writeValueAsString(dataTable);
-		GuavaDataTable dataTable2 = mapper.readValue(json, GuavaDataTable.class);
-		Table<String, String, CellValue> before = dataTable.getGuavaCustomTable().getTable();
-		Set<String> beforeKey = before.rowKeySet();
-		Table<String, String, CellValue> after = dataTable2.getGuavaCustomTable().getTable();
-		after = dataTable2.getGuavaCustomTable().getTable();
-		Set<String> afterKey = after.rowKeySet();
-		assertEquals(afterKey, beforeKey);
-		assertEquals(mapper.writeValueAsString(dataTable2), mapper.writeValueAsString(dataTable));
+		return dataTable;
 	}
 
 	@Test
